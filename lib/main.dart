@@ -1,26 +1,32 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:drink_kinds_final/favorite.dart';
 
 void main() {
-  runApp(LiquorStoreApp());
+  runApp(const LiquorStoreApp());
 }
 
 class LiquorStoreApp extends StatelessWidget {
+  const LiquorStoreApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: WelcomeScreen(),
+      home: const WelcomeScreen(),
     );
   }
 }
 
 class WelcomeScreen extends StatelessWidget {
-  final Color alcoholColor = Color(0xFFB47B48);
+  final Color alcoholColor = const Color(0xFFB47B48);
+
+  const WelcomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -30,8 +36,8 @@ class WelcomeScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.local_bar, color: alcoholColor, size: 80),
-              SizedBox(height: 16),
-              Text(
+              const SizedBox(height: 16),
+              const Text(
                 "DRINK KINDS",
                 style: TextStyle(
                   color: Colors.white,
@@ -40,14 +46,14 @@ class WelcomeScreen extends StatelessWidget {
                   letterSpacing: 2,
                 ),
               ),
-              SizedBox(height: 32),
+              const SizedBox(height: 32),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: alcoholColor,
-                  minimumSize: Size(200, 50),
+                  minimumSize: const Size(200, 50),
                 ),
-                icon: Icon(Icons.local_drink, color: Colors.white),
-                label: Text(
+                icon: const Icon(Icons.local_drink, color: Colors.white),
+                label: const Text(
                   "Browse Drinks",
                   style: TextStyle(color: Colors.white),
                 ),
@@ -55,7 +61,8 @@ class WelcomeScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => BrowseDrinksScreen()),
+                      builder: (context) => const MainNavScreen(),
+                    ),
                   );
                 },
               ),
@@ -67,7 +74,64 @@ class WelcomeScreen extends StatelessWidget {
   }
 }
 
+class MainNavScreen extends StatefulWidget {
+  const MainNavScreen({super.key});
+
+  @override
+  State<MainNavScreen> createState() => _MainNavScreenState();
+}
+
+class _MainNavScreenState extends State<MainNavScreen> {
+  int _selectedIndex = 0;
+  final Color alcoholColor = const Color(0xFFB47B48);
+
+  List<Widget> get _pages => [
+        BrowseDrinksScreen(
+          onGoToFavorite: () {
+            setState(() {
+              _selectedIndex = 1;
+            });
+          },
+        ),
+        const FavoriteScreen(),
+      ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: alcoholColor,
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white70,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.local_bar),
+            label: 'Alcohol',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: 'Favorite',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class BrowseDrinksScreen extends StatefulWidget {
+  final VoidCallback onGoToFavorite;
+
+  const BrowseDrinksScreen({super.key, required this.onGoToFavorite});
+
   @override
   State<BrowseDrinksScreen> createState() => _BrowseDrinksScreenState();
 }
@@ -106,14 +170,13 @@ class _BrowseDrinksScreenState extends State<BrowseDrinksScreen> {
   int _currentPage = 0;
   final PageController _pageController = PageController();
   Timer? _timer;
-  int cartCount = 0;
 
-  List<Map<String, dynamic>> cartItems = [];
+  final Color alcoholColor = const Color(0xFFB47B48);
 
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(Duration(seconds: 3), (Timer timer) {
+    _timer = Timer.periodic(const Duration(seconds: 3), (Timer timer) {
       if (_currentPage < recommendedImages.length - 1) {
         _currentPage++;
       } else {
@@ -121,7 +184,7 @@ class _BrowseDrinksScreenState extends State<BrowseDrinksScreen> {
       }
       _pageController.animateToPage(
         _currentPage,
-        duration: Duration(milliseconds: 350),
+        duration: const Duration(milliseconds: 350),
         curve: Curves.easeIn,
       );
       setState(() {});
@@ -135,64 +198,18 @@ class _BrowseDrinksScreenState extends State<BrowseDrinksScreen> {
     super.dispose();
   }
 
-  final Color alcoholColor = Color(0xFFB47B48);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF1C1C2D),
+      backgroundColor: const Color(0xFF1C1C2D),
       appBar: AppBar(
         backgroundColor: alcoholColor,
-        // title: Text("List of Drinks"),
-        actions: [
-          Stack(
-            alignment: Alignment.topRight,
-            children: [
-              IconButton(
-                icon: Icon(Icons.shopping_cart, color: Colors.white),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CartScreen(cartItems: cartItems),
-                    ),
-                  );
-                },
-              ),
-              if (cartItems.isNotEmpty)
-                Positioned(
-                  right: 8,
-                  top: 8,
-                  child: Container(
-                    padding: EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    constraints: BoxConstraints(
-                      minWidth: 18,
-                      minHeight: 18,
-                    ),
-                    child: Text(
-                      '${cartItems.length}',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Carousel/Slideshow at the top
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             SizedBox(
               height: 180,
               child: PageView.builder(
@@ -218,30 +235,32 @@ class _BrowseDrinksScreenState extends State<BrowseDrinksScreen> {
                 },
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
                 recommendedImages.length,
                 (index) => Container(
-                  margin: EdgeInsets.symmetric(horizontal: 4),
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
                   width: _currentPage == index ? 16 : 8,
                   height: 8,
                   decoration: BoxDecoration(
-                    color: _currentPage == index ? alcoholColor : Colors.white54,
+                    color: _currentPage == index
+                        ? alcoholColor
+                        : Colors.white54,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
               ),
             ),
-            // Hot Seller Drinks Section
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    "Hot Seller Drinks",
+                  const Text(
+                    "Popular Drinks",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -249,9 +268,7 @@ class _BrowseDrinksScreenState extends State<BrowseDrinksScreen> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {
-                      // You can implement "View All" navigation here
-                    },
+                    onPressed: () {},
                     child: Text(
                       "View All",
                       style: TextStyle(
@@ -265,9 +282,9 @@ class _BrowseDrinksScreenState extends State<BrowseDrinksScreen> {
             ),
             GridView.builder(
               shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.symmetric(horizontal: 12),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
@@ -279,13 +296,27 @@ class _BrowseDrinksScreenState extends State<BrowseDrinksScreen> {
                 return DrinkCard(
                   drink: drink,
                   onAdd: () {
-                    setState(() {
-                      cartItems.add(drink);
-                    });
+                    // You can implement favorite logic here if needed
                   },
                 );
               },
             ),
+            const SizedBox(height: 24),
+            Center(
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: alcoholColor,
+                  minimumSize: const Size(180, 48),
+                ),
+                icon: const Icon(Icons.favorite, color: Colors.white),
+                label: const Text(
+                  "Go to Favorite",
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: widget.onGoToFavorite,
+              ),
+            ),
+            const SizedBox(height: 24),
           ],
         ),
       ),
@@ -297,13 +328,13 @@ class DrinkCard extends StatelessWidget {
   final Map<String, dynamic> drink;
   final VoidCallback onAdd;
 
-  const DrinkCard({required this.drink, required this.onAdd});
+  const DrinkCard({super.key, required this.drink, required this.onAdd});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Color.fromARGB(255, 63, 53, 116),
+        color: const Color.fromARGB(255, 63, 53, 116),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -318,24 +349,26 @@ class DrinkCard extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
             drink['name'],
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+                color: Colors.white, fontWeight: FontWeight.bold),
           ),
           Text(
             drink['type'],
-            style: TextStyle(color: Colors.grey),
+            style: const TextStyle(color: Colors.grey),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFFB47B48),
-              minimumSize: Size(100, 36),
+              backgroundColor: const Color(0xFFB47B48),
+              minimumSize: const Size(100, 36),
             ),
-            icon: Icon(Icons.add_shopping_cart, color: Colors.white, size: 18),
-            label: Text(
-              "Add",
+            icon: const Icon(Icons.favorite_border,
+                color: Colors.white, size: 18),
+            label: const Text(
+              "Favorite",
               style: TextStyle(color: Colors.white),
             ),
             onPressed: onAdd,
@@ -346,104 +379,22 @@ class DrinkCard extends StatelessWidget {
   }
 }
 
-class CartScreen extends StatelessWidget {
-  final List<Map<String, dynamic>> cartItems;
-
-  const CartScreen({required this.cartItems});
+class FavoriteScreen extends StatelessWidget {
+  const FavoriteScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF1C1C2D),
+      backgroundColor: const Color(0xFF1C1C2D),
       appBar: AppBar(
-        backgroundColor: Color(0xFFB47B48),
-        title: Text("My Cart"),
+        backgroundColor: const Color(0xFFB47B48),
+        title: const Text("Favorite"),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: cartItems.isEmpty
-                ? Center(
-                    child: Text(
-                      "Your cart is empty.",
-                      style: TextStyle(color: Colors.white, fontSize: 18),
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: cartItems.length,
-                    itemBuilder: (context, index) {
-                      final item = cartItems[index];
-                      return ListTile(
-                        leading: ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.asset(
-                            item['image'],
-                            width: 50,
-                            height: 50,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        title: Text(
-                          item['name'],
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        subtitle: Text(
-                          item['type'],
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      );
-                    },
-                  ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context); // Cancel and go back
-                  },
-                  child: Text("Cancel"),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context); // Ok and go back
-                  },
-                  child: Text("OK"),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFB47B48),
-                  ),
-                  onPressed: () {
-                    // Implement purchase logic here
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text("Purchase"),
-                        content: Text("Thank you for your purchase!"),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: Text("Close"),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                  child: Text("Purchase"),
-                ),
-              ],
-            ),
-          ),
-        ],
+      body: const Center(
+        child: Text(
+          "Your favorite drinks will appear here.",
+          style: TextStyle(color: Colors.white, fontSize: 18),
+        ),
       ),
     );
   }
