@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:drink_kinds_final/favorite.dart';
+import 'package:drink_kinds_final/all_drinks.dart';
+import 'package:drink_kinds_final/profile.dart';
 
 void main() {
   runApp(const LiquorStoreApp());
@@ -85,6 +87,62 @@ class _MainNavScreenState extends State<MainNavScreen> {
   int _selectedIndex = 0;
   final Color alcoholColor = const Color(0xFFB47B48);
 
+  // Favorite drinks state
+  final List<Map<String, dynamic>> _favoriteDrinks = [];
+
+  void _addToFavorite(Map<String, dynamic> drink) {
+    if (!_favoriteDrinks.any((d) => d['name'] == drink['name'])) {
+      setState(() {
+        _favoriteDrinks.add(drink);
+      });
+    }
+  }
+
+  void _removeFromFavorite(Map<String, dynamic> drink) {
+    setState(() {
+      _favoriteDrinks.removeWhere((d) => d['name'] == drink['name']);
+    });
+  }
+
+  // All drinks (for View All)
+  List<Map<String, dynamic>> get allDrinks => [
+    {
+      'name': 'Black Label',
+      'type': 'Whiskey',
+      'image': 'assets/black.jpg',
+    },
+    {
+      'name': 'Red Wine',
+      'type': 'Wine',
+      'image': 'assets/red.jpg',
+    },
+    {
+      'name': 'Absolute Vodka',
+      'type': 'Vodka',
+      'image': 'assets/vodka.jpg',
+    },
+    {
+      'name': 'Jack Daniels',
+      'type': 'Whiskey',
+      'image': 'assets/jackdeniel.jpg',
+    },
+    {
+      'name': 'Tequila',
+      'type': 'Tequila',
+      'image': 'assets/tequila.jpg',
+    },
+    {
+      'name': 'Black Label',
+      'type': 'Whiskey',
+      'image': 'assets/blacklabel.jpg',
+    },
+    {
+      'name': 'Alfonso',
+      'type': 'Rum',
+      'image': 'assets/alfonso.jpg',
+    },
+  ];
+
   List<Widget> get _pages => [
         BrowseDrinksScreen(
           onGoToFavorite: () {
@@ -92,8 +150,22 @@ class _MainNavScreenState extends State<MainNavScreen> {
               _selectedIndex = 1;
             });
           },
+          onAddFavorite: _addToFavorite,
+          favoriteDrinks: _favoriteDrinks,
+          allDrinks: allDrinks,
+          onRemoveFavorite: _removeFromFavorite,
         ),
-        const FavoriteScreen(),
+        FavoriteScreen(
+          favoriteDrinks: _favoriteDrinks,
+          onRemoveFavorite: (drink) {
+            deleteItem(context, () => _removeFromFavorite(drink));
+          },
+          onRemoveAllFavorites: () {
+            setState(() {
+              _favoriteDrinks.clear();
+            });
+          },
+        ),
       ];
 
   void _onItemTapped(int index) {
@@ -129,8 +201,19 @@ class _MainNavScreenState extends State<MainNavScreen> {
 
 class BrowseDrinksScreen extends StatefulWidget {
   final VoidCallback onGoToFavorite;
+  final void Function(Map<String, dynamic>) onAddFavorite;
+  final List<Map<String, dynamic>> favoriteDrinks;
+  final List<Map<String, dynamic>> allDrinks;
+  final void Function(Map<String, dynamic>) onRemoveFavorite;
 
-  const BrowseDrinksScreen({super.key, required this.onGoToFavorite});
+  const BrowseDrinksScreen({
+    super.key,
+    required this.onGoToFavorite,
+    required this.onAddFavorite,
+    required this.favoriteDrinks,
+    required this.allDrinks,
+    required this.onRemoveFavorite,
+  });
 
   @override
   State<BrowseDrinksScreen> createState() => _BrowseDrinksScreenState();
@@ -138,10 +221,10 @@ class BrowseDrinksScreen extends StatefulWidget {
 
 class _BrowseDrinksScreenState extends State<BrowseDrinksScreen> {
   final List<String> recommendedImages = [
-    'assets/black.jpg',
-    'assets/red.jpg',
-    'assets/vodka.jpg',
-    'assets/jackdeniel.jpg',
+    'assets/corousel1.jpg',
+    'assets/corousel2.jpg',
+    'assets/corousel3.jpg',
+    'assets/corousel4.jpg',
   ];
 
   final List<Map<String, dynamic>> hotSellerDrinks = [
@@ -165,6 +248,7 @@ class _BrowseDrinksScreenState extends State<BrowseDrinksScreen> {
       'type': 'Whiskey',
       'image': 'assets/jackdeniel.jpg',
     },
+
   ];
 
   int _currentPage = 0;
@@ -204,6 +288,11 @@ class _BrowseDrinksScreenState extends State<BrowseDrinksScreen> {
       backgroundColor: const Color(0xFF1C1C2D),
       appBar: AppBar(
         backgroundColor: alcoholColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -268,7 +357,19 @@ class _BrowseDrinksScreenState extends State<BrowseDrinksScreen> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AllDrinksScreen(
+                            allDrinks: widget.allDrinks,
+                            favoriteDrinks: widget.favoriteDrinks,
+                            onAddFavorite: widget.onAddFavorite,
+                            onRemoveFavorite: widget.onRemoveFavorite,
+                          ),
+                        ),
+                      );
+                    },
                     child: Text(
                       "View All",
                       style: TextStyle(
@@ -293,28 +394,15 @@ class _BrowseDrinksScreenState extends State<BrowseDrinksScreen> {
               itemCount: hotSellerDrinks.length,
               itemBuilder: (context, index) {
                 final drink = hotSellerDrinks[index];
+                final isFavorite = widget.favoriteDrinks.any((d) => d['name'] == drink['name']);
                 return DrinkCard(
                   drink: drink,
+                  isFavorite: isFavorite,
                   onAdd: () {
-                    // You can implement favorite logic here if needed
+                    widget.onAddFavorite(drink);
                   },
                 );
               },
-            ),
-            const SizedBox(height: 24),
-            Center(
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: alcoholColor,
-                  minimumSize: const Size(180, 48),
-                ),
-                icon: const Icon(Icons.favorite, color: Colors.white),
-                label: const Text(
-                  "Go to Favorite",
-                  style: TextStyle(color: Colors.white),
-                ),
-                onPressed: widget.onGoToFavorite,
-              ),
             ),
             const SizedBox(height: 24),
           ],
@@ -327,8 +415,9 @@ class _BrowseDrinksScreenState extends State<BrowseDrinksScreen> {
 class DrinkCard extends StatelessWidget {
   final Map<String, dynamic> drink;
   final VoidCallback onAdd;
+  final bool isFavorite;
 
-  const DrinkCard({super.key, required this.drink, required this.onAdd});
+  const DrinkCard({super.key, required this.drink, required this.onAdd, this.isFavorite = false});
 
   @override
   Widget build(BuildContext context) {
@@ -362,16 +451,19 @@ class DrinkCard extends StatelessWidget {
           const SizedBox(height: 8),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFB47B48),
+              backgroundColor: isFavorite ? Colors.grey : const Color(0xFFB47B48),
               minimumSize: const Size(100, 36),
             ),
-            icon: const Icon(Icons.favorite_border,
-                color: Colors.white, size: 18),
-            label: const Text(
-              "Favorite",
-              style: TextStyle(color: Colors.white),
+            icon: Icon(
+              isFavorite ? Icons.favorite : Icons.favorite_border,
+              color: Colors.white,
+              size: 18,
             ),
-            onPressed: onAdd,
+            label: Text(
+              isFavorite ? "Favorited" : "Favorite",
+              style: const TextStyle(color: Colors.white),
+            ),
+            onPressed: isFavorite ? null : onAdd,
           ),
         ],
       ),
@@ -380,7 +472,11 @@ class DrinkCard extends StatelessWidget {
 }
 
 class FavoriteScreen extends StatelessWidget {
-  const FavoriteScreen({super.key});
+  final List<Map<String, dynamic>> favoriteDrinks;
+  final void Function(Map<String, dynamic>) onRemoveFavorite;
+  final VoidCallback? onRemoveAllFavorites;
+
+  const FavoriteScreen({super.key, required this.favoriteDrinks, required this.onRemoveFavorite, this.onRemoveAllFavorites});
 
   @override
   Widget build(BuildContext context) {
@@ -389,12 +485,119 @@ class FavoriteScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFFB47B48),
         title: const Text("Favorite"),
+        actions: [
+          if (favoriteDrinks.isNotEmpty && onRemoveAllFavorites != null)
+            IconButton(
+              icon: const Icon(Icons.delete_sweep, color: Colors.white),
+              tooltip: 'Delete All',
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Delete All'),
+                    content: const Text('Are you sure you want to delete all favorites?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          onRemoveAllFavorites!();
+                        },
+                        child: const Text('Delete All'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+        ],
       ),
-      body: const Center(
-        child: Text(
-          "Your favorite drinks will appear here.",
-          style: TextStyle(color: Colors.white, fontSize: 18),
+      body: favoriteDrinks.isEmpty
+          ? const Center(
+              child: Text(
+                "Your favorite drinks will appear here.",
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+            )
+          : ListView.builder(
+              itemCount: favoriteDrinks.length,
+              itemBuilder: (context, index) {
+                final drink = favoriteDrinks[index];
+                return ListTile(
+                  leading: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.asset(
+                      drink['image'],
+                      height: 48,
+                      width: 48,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  title: Text(
+                    drink['name'],
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  subtitle: Text(
+                    drink['type'],
+                    style: const TextStyle(color: Colors.white70),
+                  ),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () => onRemoveFavorite(drink),
+                  ),
+                );
+              },
+            ),
+    );
+  }
+}
+
+// New screen for View All
+class AllDrinksScreen extends StatelessWidget {
+  final List<Map<String, dynamic>> allDrinks;
+  final List<Map<String, dynamic>> favoriteDrinks;
+  final void Function(Map<String, dynamic>) onAddFavorite;
+  final void Function(Map<String, dynamic>) onRemoveFavorite;
+
+  const AllDrinksScreen({
+    super.key,
+    required this.allDrinks,
+    required this.favoriteDrinks,
+    required this.onAddFavorite,
+    required this.onRemoveFavorite,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF1C1C2D),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFB47B48),
+        title: const Text("All Drinks"),
+      ),
+      body: GridView.builder(
+        padding: const EdgeInsets.all(16),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 0.75,
         ),
+        itemCount: allDrinks.length,
+        itemBuilder: (context, index) {
+          final drink = allDrinks[index];
+          final isFavorite = favoriteDrinks.any((d) => d['name'] == drink['name']);
+          return DrinkCard(
+            drink: drink,
+            isFavorite: isFavorite,
+            onAdd: () {
+              onAddFavorite(drink);
+            },
+          );
+        },
       ),
     );
   }

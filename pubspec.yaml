@@ -66,6 +66,14 @@ flutter:
     - assets/red.jpg
     - assets/jackdeniel.jpg
     - assets/vodka.jpg
+    - assets/tequila.jpg
+    - assets/blacklabel.jpg
+    - assets/alfonso.jpg
+    - assets/corousel1.jpg
+    - assets/corousel2.jpg
+    - assets/corousel3.jpg
+    - assets/corousel4.jpg
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
