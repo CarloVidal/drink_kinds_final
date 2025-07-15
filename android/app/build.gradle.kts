@@ -8,7 +8,6 @@ plugins {
 android {
     namespace = "com.example.drink_kinds_final"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

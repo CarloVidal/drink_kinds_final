@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:drink_kinds_final/favorite.dart';
-import 'package:drink_kinds_final/all_drinks.dart';
+import 'package:drink_kinds_final/favorite.dart' show deleteItem;
 import 'package:drink_kinds_final/profile.dart';
 
 void main() {
@@ -141,6 +140,88 @@ class _MainNavScreenState extends State<MainNavScreen> {
       'type': 'Rum',
       'image': 'assets/alfonso.jpg',
     },
+    {
+      'name': 'Kwatro',
+      'type': 'Rum',
+      'image': 'assets/kwatro.jpg',
+    },
+    {
+      'name': 'Tanduay',
+      'type': 'Rum',
+      'image': 'assets/tanduay.jpg',
+    },
+    {
+      'name': 'Mojito',
+      'type': 'Rum',
+      'image': 'assets/mojito.jpg',
+    },
+    {
+      'name': 'Emperador',
+      'type': 'Rum',
+      'image': 'assets/emperador.jpg',
+    },
+    {
+      'name': 'Red Horse',
+      'type': 'Rum',
+      'image': 'assets/redhorse.jpg',
+    },
+    {
+      'name': 'Heineken',
+      'type': 'Rum',
+      'image': 'assets/ken.jpg',
+    },
+    {
+      'name': 'Tiger',
+      'type': 'Rum',
+      'image': 'assets/Tiger.jpg',
+    },
+     {
+      'name': 'Tanduay',
+      'type': 'Rum',
+      'image': 'assets/tanduay.jpg',
+    },
+     {
+      'name': 'Chivas',
+      'type': 'Rum',
+      'image': 'assets/chivas.jpg',
+    },
+   {
+      'name': 'Pilsen',
+      'type': 'Rum',
+      'image': 'assets/pilsen.jpg',
+    },
+   {
+      'name': 'San Mig Light',
+      'type': 'Rum',
+      'image': 'assets/sanmiglight.jpg',
+    },
+    {
+      'name': 'Jameson',
+      'type': 'Rum',
+      'image': 'assets/jameson.jpg',
+    },
+   {
+      'name': 'Ballatines',
+      'type': 'Rum',
+      'image': 'assets/Ballatines.jpg',
+
+    },  
+    {
+      'name': 'Aperol',
+      'type': 'Rum',
+      'image': 'assets/Aperol.jpg',
+    },
+    {
+      'name': 'Jim Beam',
+      'type': 'Rum',
+      'image': 'assets/jimbeam.jpg',
+    },
+   {
+        'name': 'Tito\'s Vodka',
+      'type': 'Rum',
+      'image': 'assets/titosvodka.jpg',
+    },  
+
   ];
 
   List<Widget> get _pages => [
@@ -166,6 +247,7 @@ class _MainNavScreenState extends State<MainNavScreen> {
             });
           },
         ),
+        const ProfileScreen(),
       ];
 
   void _onItemTapped(int index) {
@@ -192,6 +274,10 @@ class _MainNavScreenState extends State<MainNavScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.favorite),
             label: 'Favorite',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
           ),
         ],
       ),
@@ -493,22 +579,68 @@ class FavoriteScreen extends StatelessWidget {
               onPressed: () {
                 showDialog(
                   context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Delete All'),
-                    content: const Text('Are you sure you want to delete all favorites?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('Cancel'),
+                  builder: (context) => Dialog(
+                    backgroundColor: const Color(0xFF2A2A3E),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.delete_sweep, color: Color(0xFFB47B48), size: 48),
+                          const SizedBox(height: 16),
+                          const Text(
+                            'Delete All',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 22,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'Are you sure you want to delete all favorites?',
+                            style: TextStyle(color: Colors.white70, fontSize: 16),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 24),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: const Color(0xFFB47B48),
+                                    side: const BorderSide(color: Color(0xFFB47B48)),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text('Cancel'),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFFB47B48),
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    onRemoveAllFavorites!();
+                                  },
+                                  child: const Text('Delete All'),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          onRemoveAllFavorites!();
-                        },
-                        child: const Text('Delete All'),
-                      ),
-                    ],
+                    ),
                   ),
                 );
               },
@@ -556,7 +688,7 @@ class FavoriteScreen extends StatelessWidget {
 }
 
 // New screen for View All
-class AllDrinksScreen extends StatelessWidget {
+class AllDrinksScreen extends StatefulWidget {
   final List<Map<String, dynamic>> allDrinks;
   final List<Map<String, dynamic>> favoriteDrinks;
   final void Function(Map<String, dynamic>) onAddFavorite;
@@ -570,6 +702,11 @@ class AllDrinksScreen extends StatelessWidget {
     required this.onRemoveFavorite,
   });
 
+  @override
+  State<AllDrinksScreen> createState() => _AllDrinksScreenState();
+}
+
+class _AllDrinksScreenState extends State<AllDrinksScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -586,15 +723,19 @@ class AllDrinksScreen extends StatelessWidget {
           mainAxisSpacing: 12,
           childAspectRatio: 0.75,
         ),
-        itemCount: allDrinks.length,
+        itemCount: widget.allDrinks.length,
         itemBuilder: (context, index) {
-          final drink = allDrinks[index];
-          final isFavorite = favoriteDrinks.any((d) => d['name'] == drink['name']);
+          final drink = widget.allDrinks[index];
+          final isFavorite = widget.favoriteDrinks.any((d) => d['name'] == drink['name']);
           return DrinkCard(
             drink: drink,
             isFavorite: isFavorite,
             onAdd: () {
-              onAddFavorite(drink);
+              if (!isFavorite) {
+                widget.onAddFavorite(drink);
+                setState(() {}); // Refresh UI so button updates
+                // Removed SnackBar for 'added to favorites'
+              }
             },
           );
         },

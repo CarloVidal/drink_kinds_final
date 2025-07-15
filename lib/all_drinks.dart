@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:drink_kinds_final/all_drinks.dart';
 
 class AllDrinksScreen extends StatelessWidget {
   final List<Map<String, dynamic>> allDrinks;

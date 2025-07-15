@@ -31,7 +31,6 @@ dependencies:
   flutter:
     sdk: flutter
   carousel_slider: 4.0.0
-  video_player: ^2.8.6
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -69,10 +68,26 @@ flutter:
     - assets/tequila.jpg
     - assets/blacklabel.jpg
     - assets/alfonso.jpg
-    - assets/corousel1.jpg
+    - assets/kwatro.jpg 
+    - assets/mojito.jpg
+    - assets/tanduay.jpg
+    - assets/redhorse.jpg
+    - assets/emperador.jpg
+    - assets/chivas.jpg
+    - assets/ken.jpg  
+    - assets/Tiger.jpg
+    - assets/pilsen.jpg
+    - assets/sanmiglight.jpg
+    - assets/jameson.jpg
+    - assets/Ballatines.jpg
+    - assets/Aperol.jpg
+    - assets/jimbeam.jpg
+    - assets/titosvodka.jpg
+    - assets/corousel1.jpg  
     - assets/corousel2.jpg
     - assets/corousel3.jpg
     - assets/corousel4.jpg
+    - assets/profile.jpg
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
